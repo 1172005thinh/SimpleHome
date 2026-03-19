@@ -5,14 +5,13 @@
 **Date:** March 19, 2026
 **Role:** Senior Hardware Engineer
 **Task Executed:** 
-1. Re-construct project with better modularization and organization (Separating `.cpp` in `src/` and `.h` in `include/`).
-2. Implement FreeRTOS tasks and Semaphores for inter-task communication.
+1. Established Wi-Fi Connection via native ESP32 `WiFi.h`.
+2. Developed generic MQTT Sub/Pub handler via `PubSubClient` integration within an independent FreeRTOS task.
+3. Updated previously built modules (`day_night_mode`, `secured_door`, etc.) to intercept incoming state permutations asynchronously securely parsing internal global state bindings using FreeRTOS mutexes.
 
 **Details:**
-- **`include/config.h` & `include/global.h`:** Defined application-wide Constants, pin configurations, and an `AppContext` structure to hold FreeRTOS Semaphores.
-- **`src/main.cpp`:** Cleaned up. It now only allocates `AppContext` Semaphores and spawns 3 core tasks: `day_night_task`, `temp_humi_monitor`, and `secured_door_task`. The standard Arduino `loop()` correctly yields via `vTaskDelete(NULL);`.
-- **Modular Tasks:** 
-  - `src/day_night_mode.cpp` / `include/day_night_mode.h`: Reads light sensor block (1s tick) and updates NeoPixel LEDs with `semDark` / `semBright` binary semaphore signals.
-  - `src/temp_humi_monitor.cpp` / `include/temp_humi_monitor.h`: Reads DHT20 (5s tick) using default `Wire` library instances and issues threshold warnings.
-  - `src/secured_door.cpp` / `include/secured_door.h`: Scaffolding for relay logic & optional IR entry sensing (1s tick).
-- Verified `lib/` files were left untouched while referencing them natively.
+- **`include/config.h`:** Included network constants block defining dummy `WIFI_SSID`, `MQTT_BROKER`, and hardcoded application IoT top-level topics (e.g., `simplehome/sensor/temperature`).
+- **`include/global.h`:** Embedded cross-process sensor structures (`currentTemp`, `currentDoorState`, `currentLightMode`, etc.) wrapped seamlessly under the app context.
+- **`src/wifi_mqtt.cpp`:** Handles reconnection mechanics reliably without freezing hardware operation. Subscribes effectively to Control routines filtering `AUTO / ON / OFF` light commands & `LOCK / UNLOCK` relays gracefully.
+- **`src/day_night_mode.cpp` & `src/secured_door.cpp`:** Expanded logic. Physical controllers now accurately honor states defined dynamically by the incoming web payloads.
+- **`docs/MQTT_WIFI_GUIDE.md`:** Generated detailed documentation for backend / cloud engineers encompassing available topics, payloads mapped, and network configuration hooks.

@@ -6,6 +6,9 @@
 #include "freertos/task.h"
 #include "freertos/semphr.h"
 
+enum LightMode { MODE_AUTO, MODE_MANUAL_ON, MODE_MANUAL_OFF };
+enum DoorState { DOOR_LOCKED, DOOR_UNLOCKED };
+
 struct AppContext {
     SemaphoreHandle_t mutex;
     SemaphoreHandle_t semInternet;
@@ -26,6 +29,13 @@ struct AppContext {
     // Door monitoring
     SemaphoreHandle_t semDoorLocked;
     SemaphoreHandle_t semDoorUnlocked;
+
+    // Shared State Variables (Protected by mutex)
+    float currentTemp;
+    float currentHumi;
+    int currentLightLevel;
+    DoorState currentDoorState;
+    LightMode currentLightMode;
 };
 
 #endif // GLOBAL_H

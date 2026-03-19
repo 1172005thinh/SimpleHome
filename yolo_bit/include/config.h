@@ -1,13 +1,16 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-// --- Hardware Pins ---
-#define PIN_LIGHT_SENSOR    34 // IO single channel port P0 (example mapping)
-#define PIN_LED_NEOPIXEL    15 // Extended board pin
+// --- Hardware Pins Mapping (Yolo:Bit / ESP32 WROVER B) ---
+// Based on typical OhStem Yolo:Bit edge connector mapping to ESP32:
+#define PIN_LIGHT_SENSOR    32 // P0
+#define PIN_IR_SENSOR       33 // P1
+#define PIN_RELAY           25 // P2
+#define PIN_LED_NEOPIXEL    16 // P16 (Dual channel P16, P12)
 #define NUM_LEDS            4
 
-#define PIN_RELAY           4  // IO single port P2 (example mapping)
-#define PIN_IR_SENSOR       5  // IO single port P1 (example mapping)
+#define I2C_SCL_PIN         22 // P19
+#define I2C_SDA_PIN         21 // P20
 
 // --- Thresholds ---
 #define LIGHT_THRESHOLD     2000
@@ -15,5 +18,25 @@
 // --- Task Settings ---
 #define STACK_SIZE_SENSOR   2048
 #define STACK_SIZE_MAIN     4096
+#define STACK_SIZE_MQTT     4096
+
+// --- Network & MQTT Settings ---
+#define WIFI_SSID           "your_wifi_ssid"
+#define WIFI_PASSWORD       "the_pass_you_dont_remember"
+
+#define MQTT_BROKER         "some.server.com" // Example public broker
+#define MQTT_PORT           1883
+#define MQTT_CLIENT_ID      "SimpleHome_YoloBit_Client"
+#define MQTT_USER           ""
+#define MQTT_PASSWORD       ""
+
+// --- MQTT Topics ---
+#define TOPIC_PUB_LIGHT     "simplehome/sensor/light"
+#define TOPIC_PUB_TEMP      "simplehome/sensor/temperature"
+#define TOPIC_PUB_HUMI      "simplehome/sensor/humidity"
+#define TOPIC_PUB_DOOR      "simplehome/sensor/door_status"
+
+#define TOPIC_SUB_LIGHT_CTRL "simplehome/control/light" // Payload: "AUTO", "ON", "OFF"
+#define TOPIC_SUB_DOOR_CTRL  "simplehome/control/door"  // Payload: "LOCK", "UNLOCK"
 
 #endif // CONFIG_H

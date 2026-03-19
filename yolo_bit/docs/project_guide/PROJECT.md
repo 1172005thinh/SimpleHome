@@ -33,7 +33,7 @@ The MCU has an extended board with various I2C ports and analog pins, see `exten
 8. IO dual channel port connected to P3, P6.
 9. IO dual channel port connected to P10, P13.
 10. IO dual channel port connected to P14, P15.
-11. IO dual channel port connected to P16, P12.
+11. IO dual channel port connected to P16, P12. --> 4 led module
 12. A stack of 22 3 physical pins <GND, VCC, PIN>.
 
 ## Features
