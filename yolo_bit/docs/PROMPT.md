@@ -16,6 +16,7 @@
 
 ## TASK
 
-1. You are a senior hardware engineer with expertise in IoT and ESP32 microcontroller.
-2. Your task is to work on the first feature of the project: Day/Night power saving mode (wihtout the web interface control, only the automatic mode based on the light sensor).
-3. You need to export the temp and humid value to SerialMonitor for monitoring.
+1. You are a senior hardware engineer with expertise in IoT and ESP32 micro-controller.
+2. Your task is to read the project structure and re-construct with a better modularization and organization. For example, for each source file .cpp in `/src/`, you should create a corresponding header file .h in the `/include/` directory.
+3. I have updated the `/lib/` directory with some libraries for the project. You should use those libraries instead of writing the code from scratch. You can not modify the libraries, but you can create new one.
+4. We should use RTOS for the project, so you should create tasks for each module and use queues or semaphores for inter-task communication if necessary. You can use FreeRTOS which is included in the ESP32 framework. The `/src/main.cpp` should only contain the setup and loop functions. See what I have modified in the `src/main.cpp` for reference.

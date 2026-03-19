@@ -16,8 +16,25 @@ The Kit includes the following hardware components:
 4. A light sensor module
 5. A temperature and humidity sensor module (DHT20)
 6. A relay module
-7. A 1602 LCD module
+7. A 1602 LCD module (optional)
 8. An IR module
+
+## Hardware Configuration
+
+The MCU has an extended board with various I2C ports and analog pins, see `extended_board.png` for pin layout:
+
+1. MCU insert slot.
+2. DC power input (5~9V)
+3. I2C_1 port connected to P19, P20. --> DHT20 sensor module
+4. I2C_2 port connected to P19, P20. --> 1602 LCD module (optional)
+5. IO single channel port connected to P0. --> light sensor module
+6. IO single channel port connected to P1. --> IR module
+7. IO single channel port connected to P2. --> relay module
+8. IO dual channel port connected to P3, P6.
+9. IO dual channel port connected to P10, P13.
+10. IO dual channel port connected to P14, P15.
+11. IO dual channel port connected to P16, P12.
+12. A stack of 22 3 physical pins <GND, VCC, PIN>.
 
 ## Features
 
@@ -81,7 +98,7 @@ This feature allows users to remotely control the dock lock and monitor its stat
     - The system will lock the door and update the status on the web interface. The system will stay in this state for until the user changes it to Unlock mode via the toggle on the dashboard.
   - If the toggle Unlock/Lock is set to Unlock:
     - The system will unlock the door and update the status on the web interface. The system will stay in this state until the user changes it to Lock mode via the toggle on the dashboard. (Optional, there is a setting on the dashboard to automatically lock the door after a certain period of time, e.g., 30s, if there is no change in the door status.)
-  - (Optional) If the IR module detects an unauthorized entry (e.g., door is locked but the IR sensor detects door opening):
+  - (Optional) If the IR module detects an unauthorized entry (e.g., door is locked but the IR sensor detects a person moving through the door):
     - Notify: "Alert! Unauthorized entry detected. Please check your door immediately."
   - (Optional) If the IR module detects a normal entry (e.g., door is unlocked and the door movement is detected):
     - Notify: "Door is opened by someone."
@@ -97,3 +114,4 @@ This feature allows users to remotely control and monitor their smart home syste
   - All other components (light sensor, DHT20 sensor, relay module)
 - Logic:
   - The MCU connects to the Wifi network and continually updates the devices status on MQTT broker. The host server subscribes to the MQTT topics and updates the dashboard accordingly. The user can access the dashboard through a web browser via <host_server_ip>:<port> (or better a DNS name) and control the devices through the dashboard. The dashboard also displays the status of the devices and any notifications based on the logic defined in the previous features.
+
