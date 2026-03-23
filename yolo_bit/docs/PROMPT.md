@@ -17,5 +17,14 @@
 ## TASK
 
 1. You are a senior hardware engineer with expertise in IoT and ESP32 micro-controller.
-2. Discussion: The MCU with connected sensors and devices will connect to a host server hired via a cloud provider (e.g. AWS, Azure, GCP) through WiFi. The server will run a web application that serves as a dashboard for users to monitor and control the smart home system remotely. The communication between the MCU and the server will be done through MQTT protocol. The MCU will publish sensor data (e.g. light level, temperature, humidity, door status) to specific MQTT topics, and subscribe to control topics for receiving commands from the server (e.g. turn on/off lights, lock/unlock door). The server will also have a database to store all device data and user settings, and a backend to handle MQTT messages and update the dashboard accordingly. The dashboard will display real-time sensor data, allow users to control devices, and provide notifications based on certain conditions (e.g. if the temperature is too high or if the door is unlocked).
-3. You should print serial logs to the serial monitor for local debugging and monitoring of the system. The logs should include information about WiFi connection status, MQTT connection status, published sensor data, received control commands, and any errors or exceptions that occur during operation.
+2. We should connect our LCD 1602 to show some basic information. The LCD address is 21.
+3. What to show:
+   - At startup: "Welcome!"
+   - Loop:
+     - Line 1: "T: XX.X H: XX.X"
+     - Line 2: "L: XXXX D: XXXX"
+   - Value:
+     - T: current temperature (float 1 decimal)
+     - H: current humidity (float 1 decimal)
+     - L: current light level (int)
+     - D: current door status (LOCK/UNLK)

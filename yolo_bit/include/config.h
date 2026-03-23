@@ -12,6 +12,8 @@
 #define I2C_SCL_PIN         22 // P19
 #define I2C_SDA_PIN         21 // P20
 
+#define I2C_LCD_ADDR        0x21
+
 // --- Thresholds ---
 #define LIGHT_THRESHOLD     2000
 
@@ -19,12 +21,13 @@
 #define STACK_SIZE_SENSOR   2048
 #define STACK_SIZE_MAIN     4096
 #define STACK_SIZE_MQTT     4096
+#define STACK_SIZE_LCD      2048
 
 // --- Network & MQTT Settings ---
-#define WIFI_SSID           "your_wifi_ssid"
-#define WIFI_PASSWORD       "the_pass_you_dont_remember"
+#define WIFI_SSID           "701H6-KH&KTMT"
+#define WIFI_PASSWORD       "svkhktmt"
 
-#define MQTT_BROKER         "some.server.com" // Example public broker
+#define MQTT_BROKER         "hungthinhcloud.freeddns.org" // Example public broker
 #define MQTT_PORT           1883
 #define MQTT_CLIENT_ID      "SimpleHome_YoloBit_Client"
 #define MQTT_USER           ""

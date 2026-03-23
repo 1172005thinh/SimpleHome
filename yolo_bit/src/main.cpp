@@ -7,6 +7,7 @@
 #include "temp_humi_monitor.h"
 #include "secured_door.h"
 #include "wifi_mqtt.h"
+#include "lcd_module.h"
 
 void setup()
 {
@@ -26,6 +27,7 @@ void setup()
   ctx->currentDoorState = DOOR_UNLOCKED;
 
   // Create tasks for each independent module
+  xTaskCreate(lcd_task, "LCD Display Task", STACK_SIZE_LCD, ctx, 1, NULL);
   xTaskCreate(day_night_task, "Day/Night Task", STACK_SIZE_SENSOR, ctx, 1, NULL);
   xTaskCreate(temp_humi_monitor, "Temp/Humi Task", STACK_SIZE_SENSOR, ctx, 1, NULL);
   xTaskCreate(secured_door_task, "Secured Door Task", STACK_SIZE_SENSOR, ctx, 1, NULL);
