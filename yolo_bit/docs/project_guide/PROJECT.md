@@ -114,4 +114,3 @@ This feature allows users to remotely control and monitor their smart home syste
   - All other components (light sensor, DHT20 sensor, relay module)
 - Logic:
   - The MCU connects to the Wifi network and continually updates the devices status on MQTT broker. The host server subscribes to the MQTT topics and updates the dashboard accordingly. The user can access the dashboard through a web browser via <host_server_ip>:<port> (or better a DNS name) and control the devices through the dashboard. The dashboard also displays the status of the devices and any notifications based on the logic defined in the previous features.
-

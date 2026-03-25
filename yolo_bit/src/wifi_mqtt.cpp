@@ -143,6 +143,22 @@ void wifi_mqtt_task(void *pvParameters) {
             }
         }
 
+        // Handle immediate intrusion alerts
+        bool alertTriggered = false;
+        xSemaphoreTake(globalCtx->mutex, portMAX_DELAY);
+        alertTriggered = globalCtx->intrusionDetected;
+        xSemaphoreGive(globalCtx->mutex);
+
+        if (alertTriggered) {
+            if (WiFi.status() == WL_CONNECTED && mqttClient.connected()) {
+                mqttClient.publish(TOPIC_PUB_ALERT, "Alert! Unauthorized Entry");
+                Serial.println("[MQTT] Published Intrusion Alert!");
+                xSemaphoreTake(globalCtx->mutex, portMAX_DELAY);
+                globalCtx->intrusionDetected = false;
+                xSemaphoreGive(globalCtx->mutex);
+            }
+        }
+
         // Publish sensor data AND print to Serial monitor periodically
         // even if WiFi or MQTT are disconnected, so logging continues locally.
         if (currentMillis - lastPublishTime >= PUBLISH_INTERVAL) {

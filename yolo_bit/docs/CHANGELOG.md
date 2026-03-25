@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## v0.0.2 - 25/03/2026
+
+- **Added Intrusion Detection (IR Module):** Integrated `PIN_IR_SENSOR` (GPIO 33) into `secured_door_task`. The system now monitors for movement using rising edge detection. If motion is detected while the door is in the `DOOR_LOCKED` state, it raises an intrusion flag in the global context.
+- **Immediate MQTT Alerting:** Updated `wifi_mqtt_task` to instantly read the hardware-level alert flag and publish an "Alert! Unauthorized Entry" payload to the `simplehome/sensor/alert` topic when triggered.
+
 ## v0.0.1 - 23/03/2026
 
 - Initial project setup and documentation.

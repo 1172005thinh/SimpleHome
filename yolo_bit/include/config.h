@@ -27,7 +27,7 @@
 #define WIFI_SSID           "701H6-KH&KTMT"
 #define WIFI_PASSWORD       "svkhktmt"
 
-#define MQTT_BROKER         "hungthinhcloud.freeddns.org" // Example public broker
+#define MQTT_BROKER         "hungthinhcloud.freeddns.org" // Personal private server
 #define MQTT_PORT           1883
 #define MQTT_CLIENT_ID      "SimpleHome_YoloBit_Client"
 #define MQTT_USER           ""
@@ -38,6 +38,7 @@
 #define TOPIC_PUB_TEMP      "simplehome/sensor/temperature"
 #define TOPIC_PUB_HUMI      "simplehome/sensor/humidity"
 #define TOPIC_PUB_DOOR      "simplehome/sensor/door_status"
+#define TOPIC_PUB_ALERT     "simplehome/sensor/alert"
 
 #define TOPIC_SUB_LIGHT_CTRL "simplehome/control/light" // Payload: "AUTO", "ON", "OFF"
 #define TOPIC_SUB_DOOR_CTRL  "simplehome/control/door"  // Payload: "LOCK", "UNLOCK"

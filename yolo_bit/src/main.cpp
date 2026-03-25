@@ -25,6 +25,7 @@ void setup()
   ctx->currentLightLevel = 0;
   ctx->currentLightMode = MODE_AUTO;
   ctx->currentDoorState = DOOR_UNLOCKED;
+  ctx->intrusionDetected = false;
 
   // Create tasks for each independent module
   xTaskCreate(lcd_task, "LCD Display Task", STACK_SIZE_LCD, ctx, 1, NULL);

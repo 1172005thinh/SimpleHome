@@ -36,6 +36,7 @@ struct AppContext {
     int currentLightLevel;
     DoorState currentDoorState;
     LightMode currentLightMode;
+    bool intrusionDetected;
 };
 
 #endif // GLOBAL_H

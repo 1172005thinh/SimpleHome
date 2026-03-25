@@ -25,18 +25,21 @@ void secured_door_task(void *pvParameters) {
         }
 
         // Read door status (IR sensor for intrusion)
+        // Usually, IR sensors trigger LOW when obstacle is present, or HIGH depending on the module.
+        // Assuming HIGH = movement detected for this scenario.
+        static bool last_ir_status = false;
         int ir_status = digitalRead(PIN_IR_SENSOR);
-        if (ir_status == HIGH) { 
-            // Example logic: door movement detected
+        
+        if (ir_status == HIGH && !last_ir_status) { 
             if (cmdState == DOOR_LOCKED) {
-                // Unauthorized!
                 Serial.println("[SECURITY] EXCEPTION: Unauthorized entry! System is LOCKED.");
-            } else {
-                // General telemetry, but limit print spam (e.g. only print on edge change in production)
-                // Serial.println("[SECURITY] Door movement detected.");
+                xSemaphoreTake(ctx->mutex, portMAX_DELAY);
+                ctx->intrusionDetected = true;
+                xSemaphoreGive(ctx->mutex);
             }
         }
+        last_ir_status = (ir_status == HIGH);
 
-        vTaskDelay(pdMS_TO_TICKS(1000));
+        vTaskDelay(pdMS_TO_TICKS(100)); // Polling at 10Hz to be responsive
     }
 }

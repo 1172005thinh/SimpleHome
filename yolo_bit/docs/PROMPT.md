@@ -17,14 +17,9 @@
 ## TASK
 
 1. You are a senior hardware engineer with expertise in IoT and ESP32 micro-controller.
-2. We should connect our LCD 1602 to show some basic information. The LCD address is 21.
-3. What to show:
-   - At startup: "Welcome!"
-   - Loop:
-     - Line 1: "T: XX.X H: XX.X"
-     - Line 2: "L: XXXX D: XXXX"
-   - Value:
-     - T: current temperature (float 1 decimal)
-     - H: current humidity (float 1 decimal)
-     - L: current light level (int)
-     - D: current door status (LOCK/UNLK)
+2. According to the `docs/REPORT.md`, there are 3 undone tasks remaining:
+   - **Optional Feature - Intrusion Detection (IR Module)**
+   - **Hardware System Profiling**
+   - **Dashboard/Database (External)**
+3. For this prompt, you will implement the first task: **Optional Feature - Intrusion Detection (IR Module)**.
+4. Question: Is the board already capable of receiving commands from the dashboard controller? If not, mark this task undone in the `docs/REPORT.md` and update the `docs/CHANGELOG.md` with the changes you made. If yes, just report how the board receives the commands.
