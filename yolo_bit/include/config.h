@@ -27,7 +27,7 @@
 #define WIFI_SSID           "701H6-KH&KTMT"
 #define WIFI_PASSWORD       "svkhktmt"
 
-#define MQTT_BROKER         "hungthinhcloud.freeddns.org" // Personal private server
+#define MQTT_BROKER         "broker.hivemq.com" // Public MQTT broker for quick testing
 #define MQTT_PORT           1883
 #define MQTT_CLIENT_ID      "SimpleHome_YoloBit_Client"
 #define MQTT_USER           ""
