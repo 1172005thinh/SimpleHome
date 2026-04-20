@@ -5,23 +5,33 @@
 // Based on typical OhStem Yolo:Bit edge connector mapping to ESP32:
 #define PIN_LIGHT_SENSOR    32 // P0
 #define PIN_IR_SENSOR       33 // P1
-#define PIN_RELAY           25 // P2
-#define PIN_LED_NEOPIXEL    16 // P16 (Dual channel P16, P12)
+#define PIN_RELAY           27 // P2
+#define PIN_LED_NEOPIXEL    5 // P16 (Dual channel P16, P12)
 #define NUM_LEDS            4
 
 #define I2C_SCL_PIN         22 // P19
 #define I2C_SDA_PIN         21 // P20
 
 #define I2C_LCD_ADDR        0x21
+/*
+Yolo:Bit Pinout
+P0:         32
+P1:         33
+P2:         27
+P3.P6:      2
+P10.P13:    26
+P14.P15:    19
+P16.P12:    5
+*/
 
 // --- Thresholds ---
 #define LIGHT_THRESHOLD     2000
 
 // --- Task Settings ---
-#define STACK_SIZE_SENSOR   2048
+#define STACK_SIZE_SENSOR   4096
 #define STACK_SIZE_MAIN     4096
 #define STACK_SIZE_MQTT     4096
-#define STACK_SIZE_LCD      2048
+#define STACK_SIZE_LCD      4096
 
 // --- Network & MQTT Settings ---
 #define WIFI_SSID           "701H6-KH&KTMT"
