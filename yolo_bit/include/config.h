@@ -7,6 +7,7 @@
 #define PIN_IR_SENSOR       33 // P1
 #define PIN_RELAY           27 // P2
 #define PIN_LED_NEOPIXEL    5 // P16 (Dual channel P16, P12)
+#define PIN_FAN_PWM         26 // P10 (PWM output to fan driver)
 #define NUM_LEDS            4
 
 #define I2C_SCL_PIN         22 // P19
@@ -23,6 +24,11 @@ P10.P13:    26
 P14.P15:    19
 P16.P12:    5
 */
+
+// --- Fan PWM Settings ---
+#define FAN_PWM_CHANNEL     0
+#define FAN_PWM_FREQ        25000
+#define FAN_PWM_RESOLUTION  8
 
 // --- Thresholds ---
 #define LIGHT_THRESHOLD     2000
@@ -49,8 +55,11 @@ P16.P12:    5
 #define TOPIC_PUB_HUMI      "simplehome/sensor/humidity"
 #define TOPIC_PUB_DOOR      "simplehome/sensor/door_status"
 #define TOPIC_PUB_ALERT     "simplehome/sensor/alert"
+#define TOPIC_PUB_FAN_STATUS "simplehome/sensor/fan_status"
+#define TOPIC_PUB_FAN_SPEED  "simplehome/sensor/fan_speed"
 
 #define TOPIC_SUB_LIGHT_CTRL "simplehome/control/light" // Payload: "AUTO", "ON", "OFF"
 #define TOPIC_SUB_DOOR_CTRL  "simplehome/control/door"  // Payload: "LOCK", "UNLOCK"
+#define TOPIC_SUB_FAN_CTRL   "simplehome/control/fan"   // Payload: "ON", "OFF", "SPEED:0..100", "0..100"
 
 #endif // CONFIG_H

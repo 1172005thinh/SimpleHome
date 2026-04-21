@@ -39,18 +39,20 @@ void lcd_task(void *pvParameters) {
         t_door = ctx->currentDoorState;
         xSemaphoreGive(ctx->mutex);
         
-        // Line 1: "T: XX.X H: XX.X " 
-        // %4.1f forces width of 4 including point (ex: "25.4" or " 8.1")
-        snprintf(buffer1, sizeof(buffer1), "T:%4.1f H:%4.1f ", t_temp, t_humi);
+        // Line 1: Temperature + Humidity
+        snprintf(buffer1, sizeof(buffer1), "T:%4.1fC H:%4.1f", t_temp, t_humi);
         
-        // Line 2: "L: XXXX D: XXXX "
-        // %-4d pads left-justified up to 4 digits (ex: "1234")
-        snprintf(buffer2, sizeof(buffer2), "L:%-4d D:%-4s ", t_light, (t_door == DOOR_LOCKED) ? "LOCK" : "UNLK");
+        // Line 2: Light intensity + Door status
+        snprintf(buffer2, sizeof(buffer2), "L:%-4d D:%-4s", t_light, (t_door == DOOR_LOCKED) ? "LOCK" : "UNLK");
         
-        // Overwrite displays instead of lcd.clear() to prevent flickering
+        // Overwrite fixed-width lines instead of lcd.clear() to reduce flickering
+        lcd.setCursor(0, 0);
+        lcd.print("                ");
         lcd.setCursor(0, 0);
         lcd.print(buffer1);
         
+        lcd.setCursor(0, 1);
+        lcd.print("                ");
         lcd.setCursor(0, 1);
         lcd.print(buffer2);
         

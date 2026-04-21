@@ -8,6 +8,7 @@
 #include "secured_door.h"
 #include "wifi_mqtt.h"
 #include "lcd_module.h"
+#include "fan_control.h"
 
 void setup()
 {
@@ -25,6 +26,8 @@ void setup()
   ctx->currentLightLevel = 0;
   ctx->currentLightMode = MODE_AUTO;
   ctx->currentDoorState = DOOR_UNLOCKED;
+  ctx->currentFanEnabled = false;
+  ctx->currentFanSpeedPercent = 0;
   ctx->intrusionDetected = false;
 
   // Create tasks for each independent module
@@ -32,6 +35,7 @@ void setup()
   xTaskCreate(day_night_task, "Day/Night Task", STACK_SIZE_SENSOR, ctx, 1, NULL);
   xTaskCreate(temp_humi_monitor, "Temp/Humi Task", STACK_SIZE_SENSOR, ctx, 1, NULL);
   xTaskCreate(secured_door_task, "Secured Door Task", STACK_SIZE_SENSOR, ctx, 1, NULL);
+  xTaskCreate(fan_task, "Fan Task", STACK_SIZE_SENSOR, ctx, 1, NULL);
   
   // Wi-Fi & MQTT Client Task
   xTaskCreate(wifi_mqtt_task, "WiFi/MQTT Task", STACK_SIZE_MQTT, ctx, 2, NULL);

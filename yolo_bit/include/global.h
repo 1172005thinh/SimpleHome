@@ -36,6 +36,8 @@ struct AppContext {
     int currentLightLevel;
     DoorState currentDoorState;
     LightMode currentLightMode;
+    bool currentFanEnabled;
+    int currentFanSpeedPercent;
     bool intrusionDetected;
 };
 

@@ -7,11 +7,30 @@ WiFiClient espClient;
 PubSubClient mqttClient(espClient);
 AppContext* globalCtx = nullptr;
 
+static int clampPercent(int value) {
+    if (value < 0) return 0;
+    if (value > 100) return 100;
+    return value;
+}
+
+static bool isNumericPayload(const String& value) {
+    if (value.length() == 0) return false;
+    for (unsigned int i = 0; i < value.length(); i++) {
+        if (!isDigit(value[i])) {
+            return false;
+        }
+    }
+    return true;
+}
+
 void mqttCallback(char* topic, byte* payload, unsigned int length) {
     String msg;
     for (unsigned int i = 0; i < length; i++) {
         msg += (char)payload[i];
     }
+    String normalizedMsg = msg;
+    normalizedMsg.trim();
+    normalizedMsg.toUpperCase();
     
     Serial.println("=====================================");
     Serial.print("[MQTT] Received Control Command at Topic: ");
@@ -27,13 +46,13 @@ void mqttCallback(char* topic, byte* payload, unsigned int length) {
     xSemaphoreTake(globalCtx->mutex, portMAX_DELAY);
     
     if (String(topic) == TOPIC_SUB_LIGHT_CTRL) {
-        if (msg == "AUTO") {
+        if (normalizedMsg == "AUTO") {
             globalCtx->currentLightMode = MODE_AUTO;
             Serial.println("[MQTT] Action: Light Mode set to AUTO");
-        } else if (msg == "ON") {
+        } else if (normalizedMsg == "ON") {
             globalCtx->currentLightMode = MODE_MANUAL_ON;
             Serial.println("[MQTT] Action: Light Mode set to MANUAL ON");
-        } else if (msg == "OFF") {
+        } else if (normalizedMsg == "OFF") {
             globalCtx->currentLightMode = MODE_MANUAL_OFF;
             Serial.println("[MQTT] Action: Light Mode set to MANUAL OFF");
         } else {
@@ -41,14 +60,49 @@ void mqttCallback(char* topic, byte* payload, unsigned int length) {
         }
     } 
     else if (String(topic) == TOPIC_SUB_DOOR_CTRL) {
-        if (msg == "LOCK") {
+        if (normalizedMsg == "LOCK") {
             globalCtx->currentDoorState = DOOR_LOCKED;
             Serial.println("[MQTT] Action: Door State set to LOCKED");
-        } else if (msg == "UNLOCK") {
+        } else if (normalizedMsg == "UNLOCK") {
             globalCtx->currentDoorState = DOOR_UNLOCKED;
             Serial.println("[MQTT] Action: Door State set to UNLOCKED");
         } else {
             Serial.println("[MQTT] WARNING: Unknown Door Command");
+        }
+    }
+    else if (String(topic) == TOPIC_SUB_FAN_CTRL) {
+        if (normalizedMsg == "ON") {
+            globalCtx->currentFanEnabled = true;
+            if (globalCtx->currentFanSpeedPercent == 0) {
+                globalCtx->currentFanSpeedPercent = 100;
+            }
+            Serial.print("[MQTT] Action: Fan ON at ");
+            Serial.print(globalCtx->currentFanSpeedPercent);
+            Serial.println("%");
+        } else if (normalizedMsg == "OFF") {
+            globalCtx->currentFanEnabled = false;
+            Serial.println("[MQTT] Action: Fan OFF");
+        } else {
+            int speed = -1;
+            if (normalizedMsg.startsWith("SPEED:")) {
+                String speedPart = normalizedMsg.substring(6);
+                speedPart.trim();
+                if (isNumericPayload(speedPart)) {
+                    speed = clampPercent(speedPart.toInt());
+                }
+            } else if (isNumericPayload(normalizedMsg)) {
+                speed = clampPercent(normalizedMsg.toInt());
+            }
+
+            if (speed >= 0) {
+                globalCtx->currentFanSpeedPercent = speed;
+                globalCtx->currentFanEnabled = (speed > 0);
+                Serial.print("[MQTT] Action: Fan speed set to ");
+                Serial.print(globalCtx->currentFanSpeedPercent);
+                Serial.println("%");
+            } else {
+                Serial.println("[MQTT] WARNING: Unknown Fan Command");
+            }
         }
     } else {
          Serial.println("[MQTT] WARNING: Unknown Topic received");
@@ -100,6 +154,7 @@ void reconnectMQTT() {
             // Subscribe to control topics
             mqttClient.subscribe(TOPIC_SUB_LIGHT_CTRL);
             mqttClient.subscribe(TOPIC_SUB_DOOR_CTRL);
+            mqttClient.subscribe(TOPIC_SUB_FAN_CTRL);
             Serial.println("[MQTT] Subscribed to Control Topics successfully.");
         } else {
             Serial.print(" FAILED, State code: ");
@@ -165,6 +220,8 @@ void wifi_mqtt_task(void *pvParameters) {
             float t_temp, t_humi;
             int t_light;
             DoorState t_door;
+            bool t_fanEnabled;
+            int t_fanSpeed;
             
             // Read shared data safely
             xSemaphoreTake(globalCtx->mutex, portMAX_DELAY);
@@ -172,6 +229,8 @@ void wifi_mqtt_task(void *pvParameters) {
             t_humi = globalCtx->currentHumi;
             t_light = globalCtx->currentLightLevel;
             t_door = globalCtx->currentDoorState;
+            t_fanEnabled = globalCtx->currentFanEnabled;
+            t_fanSpeed = globalCtx->currentFanSpeedPercent;
             xSemaphoreGive(globalCtx->mutex);
 
             // Always log sensor data locally
@@ -180,6 +239,8 @@ void wifi_mqtt_task(void *pvParameters) {
             Serial.print("  -> Humi: "); Serial.println(t_humi);
             Serial.print("  -> Light: "); Serial.println(t_light);
             Serial.print("  -> Door: "); Serial.println(t_door == DOOR_LOCKED ? "LOCKED" : "UNLOCKED");
+            Serial.print("  -> Fan: "); Serial.print(t_fanEnabled ? "ON" : "OFF");
+            Serial.print(" ("); Serial.print(t_fanSpeed); Serial.println("%)");
             
             // Attempt to publish over MQTT if completely connected
             if (WiFi.status() == WL_CONNECTED && mqttClient.connected()) {
@@ -199,6 +260,10 @@ void wifi_mqtt_task(void *pvParameters) {
                 } else {
                     mqttClient.publish(TOPIC_PUB_DOOR, "UNLOCKED");
                 }
+
+                mqttClient.publish(TOPIC_PUB_FAN_STATUS, t_fanEnabled ? "ON" : "OFF");
+                sprintf(msgBuffer, "%d", t_fanSpeed);
+                mqttClient.publish(TOPIC_PUB_FAN_SPEED, msgBuffer);
                 Serial.println("  -> [MQTT] Published successfully to Broker.");
             } else {
                 Serial.println("  -> [MQTT] Not connected. Pending local data...");
