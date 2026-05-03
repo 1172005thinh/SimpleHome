@@ -1,0 +1,160 @@
+.page {
+  min-height: 100vh;
+  padding-bottom: 2rem;
+}
+
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.9rem;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.titleWrap {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.title {
+  font-size: clamp(1.5rem, 3vw, 2rem);
+}
+
+.subtitle {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+}
+
+.topActions {
+  display: flex;
+  gap: 0.6rem;
+  align-items: center;
+}
+
+.select {
+  min-width: 220px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.55rem 0.7rem;
+  background: var(--surface-strong);
+}
+
+.outlineBtn,
+.primaryBtn,
+.ghostBtn {
+  border: none;
+  border-radius: 10px;
+  padding: 0.58rem 0.9rem;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.primaryBtn {
+  color: #fff;
+  background: linear-gradient(120deg, var(--brand), var(--brand-strong));
+}
+
+.outlineBtn {
+  color: var(--brand-strong);
+  background: rgba(15, 111, 255, 0.1);
+}
+
+.ghostBtn {
+  color: var(--text-main);
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.55);
+}
+
+.grid {
+  display: grid;
+  gap: 0.8rem;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  margin-bottom: 0.9rem;
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 0.9rem;
+  box-shadow: var(--shadow);
+}
+
+.cardLabel {
+  color: var(--text-muted);
+  font-size: 0.83rem;
+  margin-bottom: 0.2rem;
+}
+
+.cardValue {
+  font-family: var(--font-display), "Segoe UI", sans-serif;
+  font-size: 1.3rem;
+  font-weight: 700;
+}
+
+.ok {
+  color: var(--ok);
+}
+
+.warn {
+  color: var(--warn);
+}
+
+.controls {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 0.8rem;
+}
+
+.controlCard {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 1rem;
+  box-shadow: var(--shadow);
+}
+
+.controlTitle {
+  margin-bottom: 0.65rem;
+  font-size: 1.1rem;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  margin-top: 0.5rem;
+}
+
+.slider {
+  width: 100%;
+  margin-top: 0.5rem;
+}
+
+.note {
+  color: var(--text-muted);
+  font-size: 0.86rem;
+  margin-top: 0.5rem;
+}
+
+.error {
+  color: var(--error);
+  margin-bottom: 0.8rem;
+}
+
+.info {
+  color: var(--text-muted);
+  margin-bottom: 0.8rem;
+}
+
+@media (max-width: 760px) {
+  .topActions {
+    width: 100%;
+  }
+
+  .select {
+    min-width: 0;
+    flex: 1;
+  }
+}
