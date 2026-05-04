@@ -4,7 +4,9 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-const client = mqtt.connect(process.env.MQTT_BROKER || 'mqtt://mosquitto_public:1883');
+const client = mqtt.connect(process.env.MQTT_BROKER || 'mqtt://mosquitto_public:1883', {
+  reconnectPeriod: 5000,
+});
 
 export const initMQTT = () => {
   client.on('connect', () => {
@@ -45,7 +47,12 @@ export const initMQTT = () => {
 };
 
 export const publishCommand = (topic: string, message: string) => {
+  if (!client.connected) {
+    throw new Error('MQTT broker is not connected');
+  }
   client.publish(topic, message);
 };
+
+export const isMQTTConnected = () => client.connected;
 
 export default client;

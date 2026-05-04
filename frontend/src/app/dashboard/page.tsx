@@ -50,7 +50,6 @@ export default function DashboardPage() {
   const router = useRouter();
   const { isReady, isAuthenticated, token, username, signOut } = useAuth();
   const { theme, setTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
 
   const [devices, setDevices] = useState<DeviceSummary[]>([]);
   const [telemetry, setTelemetry] = useState<TelemetrySnapshot>({});
@@ -66,10 +65,6 @@ export default function DashboardPage() {
     door: "LOCK",
     fan: "SPEED"
   });
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   useEffect(() => {
     if (isReady && !isAuthenticated) {
@@ -140,7 +135,7 @@ export default function DashboardPage() {
   };
 
   const renderThemeIcon = () => {
-    if (!mounted) return <Monitor size={20} />;
+    if (!theme) return <Monitor size={20} />;
     if (theme === "light") return <Sun size={20} />;
     if (theme === "dark") return <Moon size={20} />;
     return <Monitor size={20} />;

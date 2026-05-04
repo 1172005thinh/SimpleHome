@@ -2,16 +2,57 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import { query } from './src/db';
-import { initMQTT, publishCommand } from './src/mqtt';
+import { initMQTT, isMQTTConnected, publishCommand } from './src/mqtt';
 
 dotenv.config();
 
 const app = express();
-app.use(cors());
-app.use(express.json());
+const defaultAllowedOrigins = ['https://dashboard.hungthinhcloud.freeddns.org'];
+const allowedOrigins = (process.env.CORS_ORIGINS ?? defaultAllowedOrigins.join(','))
+  .split(',')
+  .map((value) => value.trim())
+  .filter(Boolean);
+
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+        return;
+      }
+      callback(new Error(`CORS blocked for origin: ${origin}`));
+    },
+  }),
+);
+app.use(express.json({ limit: '64kb' }));
 
 // Initialize MQTT Subscriber
 initMQTT();
+
+// --- Health Endpoints ---
+app.get('/api/health', async (_req, res) => {
+  try {
+    await query('SELECT 1');
+    const mqttConnected = isMQTTConnected();
+    const statusCode = mqttConnected ? 200 : 503;
+    res.status(statusCode).json({
+      status: mqttConnected ? 'ok' : 'degraded',
+      services: {
+        database: 'ok',
+        mqtt: mqttConnected ? 'ok' : 'disconnected',
+      },
+    });
+  } catch (err) {
+    res.status(503).json({
+      status: 'down',
+      services: {
+        database: 'down',
+        mqtt: isMQTTConnected() ? 'ok' : 'disconnected',
+      },
+      message: err instanceof Error ? err.message : 'Health check failed',
+    });
+  }
+});
 
 // --- Auth Endpoints ---
 app.post('/api/auth/login', async (req, res) => {
@@ -94,4 +135,5 @@ app.post('/api/control', async (req, res) => {
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {
   console.log(`[SERVER] SimpleHome Backend running on port ${PORT}`);
+  console.log(`[SERVER] Allowed CORS origins: ${allowedOrigins.join(', ')}`);
 });
