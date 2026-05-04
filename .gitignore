@@ -1,6 +1,8 @@
 # Personal files
 database/data/
+database/init.sql
 node_modules/
 .next/
 .env*
+*.local
 IDEAS.md
