@@ -1,2 +1,6 @@
 # Personal files
+database/data/
+node_modules/
+.next/
+.env*
 IDEAS.md
