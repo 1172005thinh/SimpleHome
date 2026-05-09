@@ -7,7 +7,7 @@ import { initMQTT, isMQTTConnected, publishCommand } from './src/mqtt';
 dotenv.config();
 
 const app = express();
-const defaultAllowedOrigins = ['https://dashboard.hungthinhcloud.freeddns.org'];
+const defaultAllowedOrigins = ['https://simplehome.hungthinhcloud.freeddns.org'];
 const allowedOrigins = (process.env.CORS_ORIGINS ?? defaultAllowedOrigins.join(','))
   .split(',')
   .map((value) => value.trim())
