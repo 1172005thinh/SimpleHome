@@ -1,0 +1,59 @@
+\newpage
+\section{Kết luận và Hướng phát triển}
+
+\subsection*{Tóm tắt kết quả}
+
+Hệ thống SimpleHome là một prototype end-to-end cho nhà thông minh, bao gồm các thành phần chính:
+\begin{itemize}
+    \item Lớp thiết bị: board Yolo:Bit (ESP32) publish/subscribe qua MQTT (topic tiền tố simplehome/sensor/ và simplehome/control/).
+    \item Tầng tích hợp: backend Node.js (TypeScript) hoạt động như MQTT bridge và REST API, cài đặt các endpoint chính như \texttt{/api/health}, \texttt{/api/auth/login}, \texttt{/api/devices}, \texttt{/api/telemetry}, \texttt{/api/control}.
+    \item Lớp lưu trữ: PostgreSQL (container simplehome\_db) lưu users, devices, telemetry\_logs, control\_logs.
+    \item Giao diện: frontend Next.js (container simplehome\_frontend) cung cấp trang đăng nhập, dashboard thời gian thực, và widgets điều khiển.
+    \item Orchestration: Docker Compose với mạng simplehome\_net, healthchecks và proxy (Nginx Proxy Manager) cho SSL và tên miền công khai.
+\end{itemize}
+
+Trong phạm vi triển khai thực nghiệm, các tính năng chức năng cơ bản đã hoạt động: thiết bị gửi telemetry, backend ghi nhận vào database, frontend hiển thị dữ liệu và gửi lệnh điều khiển, và các hành động được ghi vào control\_logs.
+
+\subsection*{Những điểm mạnh}
+\begin{itemize}
+    \item Kiến trúc rõ ràng, module hoá và dễ tái tạo bằng Docker Compose.
+    \item Kết hợp MQTT và REST API cho phép cả thiết bị nhẹ và UI web tương tác linh hoạt.
+    \item Tích hợp healthchecks và cấu hình proxy giúp triển khai thực tế dễ dàng hơn.
+    \item Frontend đã cung cấp trải nghiệm dashboard trực quan (theme, cards, control widgets) phù hợp để demo.
+    \item Hạ tầng bảo mật mạnh mẽ: Sử dụng Authelia (SSO) và Headscale VPN để bảo vệ quyền truy cập từ xa, kết hợp với Crownstrike để giám sát hệ thống.
+    \item Hệ thống sao lưu tin cậy: Quy trình sao lưu định kỳ bằng Restic và Timeshift giúp bảo vệ toàn diện dữ liệu ứng dụng và cấu hình hệ điều hành.
+\end{itemize}
+
+\subsection*{Hạn chế và rủi ro}
+\begin{itemize}
+    \item Xác thực hiện đang dùng bản mẫu (ví dụ so sánh mật khẩu trực tiếp trong server.ts và trả về “dummy-jwt-token”); cần thay bằng cơ chế băm mật khẩu (bcrypt/argon2) và phát hành JWT hợp lệ.
+    \item Chưa có thiết lập hoàn chỉnh cho bảo mật MQTT (TLS, credential management) trong docker-compose.yml mặc định; broker hiện tại mosquitto\_public:1883 cần gia cố trước khi mở ra public.
+    \item Kiểm thử hiện tại chủ yếu thủ công; thiếu số liệu định lượng về latency, throughput, và resource usage.
+    \item Chưa thực hiện kiểm thử tải và phân tích giới hạn mở rộng (scalability).
+\end{itemize}
+
+\subsection*{Hướng phát triển}
+Các bước cụ thể để chuyển prototype thành hệ thống sẵn sàng thử nghiệm quy mô lớn:
+\begin{enumerate}
+    \item Hoàn thiện bảo mật và xác thực: sử dụng bcrypt/argon2 cho password hashing, phát JWT có thời hạn, cấu hình TLS cho Mosquitto và HTTPS cho tất cả endpoint qua Nginx Proxy Manager.
+    \item Tự động hoá kiểm thử và thu thập metrics: tạo script MQTT producer để mô phỏng thiết bị, dùng k6 hoặc wrk để stress test API; thu metrics bằng Prometheus và hiển thị với Grafana.
+    \item Cải thiện độ tin cậy thiết bị: thêm buffering/local queue trên ESP32, định nghĩa QoS MQTT phù hợp, và cơ chế retry/backoff.
+    \item Giám sát và logging tập trung: cấu hình Prometheus + Grafana cho hệ thống, và thu thập logs bằng Loki/ELK để điều tra vận hành.
+    \item CI/CD và reproducibility: thêm workflow để build/test backend \& frontend, migration script cho database và pipeline để build LaTeX report tự động (nếu cần lưu PDF lên artifact).
+\end{enumerate}
+
+Tổng kết: dự án đã đạt được mục tiêu làm một prototype chức năng, minh hoạ rõ ràng luồng dữ liệu IoT hiện đại. Để tiến tới bản sản phẩm thử nghiệm thực tế, cần hoàn thiện bảo mật, tự động hoá kiểm thử và bổ sung giám sát/metrics.
+
+\subsection*{Mã nguồn dự án (Open Source)}
+Toàn bộ mã nguồn của dự án (bao gồm Firmware, Backend, Frontend và cấu hình Docker) được công khai tại GitHub để cộng đồng có thể tham khảo và phát triển thêm:
+\begin{itemize}
+    \item \textbf{GitHub Repository:} \href{https://github.com/1172005thinh/SimpleHome}{https://github.com/1172005thinh/SimpleHome}
+\end{itemize}
+
+\subsection*{Video demo hệ thống}
+Dưới đây là 2 video demo toàn bộ hệ thống, đặc biệt là các kết nối phần cứng và gửi, nhận dữ liệu:
+
+\begin{itemize}
+    \item \textbf{Video 1:} \url{https://drive.google.com/file/d/1_R6q75e3g_idZ6Z0cX_BRRGPLo0O4WNj/view?usp=sharing}
+    \item \textbf{Video 2:} \url{https://drive.google.com/file/d/161cljkO3V_iJdFpw-oboBGnbW5D98J-w/view?usp=drive_link}
+\end{itemize}

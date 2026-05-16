@@ -1,0 +1,741 @@
+Đại học Quốc gia Thành phố Hồ Chí Minh
+Trường Đại học Bách Khoa
+Khoa Khoa học và Kỹ thuật máy tính
+
+Đồ án Đa ngành hướng CNPM (CO3109)
+BÁO CÁO ĐỒ ÁN
+
+NGÔI NHÀ THÔNG MINH YOLO HOME
+
+Giảng viên hướng dẫn:
+Sinh viên:
+
+Phan Văn Sỹ
+Lê Hoàng Tân - 2313050
+Nguyễn Hưng Thịnh - 2313287
+
+Thành phố Hồ Chí Minh - 2026
+
+Trường Đại học Bách Khoa
+Khoa Khoa học và Kỹ thuật máy tính
+
+Mục lục
+1 Giới thiệu
+
+3
+
+2 Cơ sở lý thuyết
+2.1 Internet of Things (IoT) và Giao thức MQTT . . . . . . . . . . . . . . . . . .
+2.2 Hệ quản trị Cơ sở dữ liệu Quan hệ (PostgreSQL) . . . . . . . . . . . . . . .
+2.3 Kiến trúc Server-Side với Node.js và Next.js . . . . . . . . . . . . . . . . . .
+2.4 Ảo hóa với Docker . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+5
+5
+5
+5
+5
+
+3 Phân tích và Thiết kế hệ thống
+3.1 Hạ tầng Máy chủ (Server Infrastructure) . . . . . . . . . . . . . . . . . . .
+3.1.1 Cấu hình Phần cứng . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+3.1.2 Môi trường Phần mềm và Bảo mật . . . . . . . . . . . . . . . . . . . .
+3.1.3 Hệ sinh thái Container . . . . . . . . . . . . . . . . . . . . . . . . . . .
+3.1.4 Mạng và Sao lưu . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+3.2 Kiến trúc hệ thống . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+3.3 Thiết kế Cơ sở dữ liệu . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+3.4 Giao thức truyền thông (MQTT) . . . . . . . . . . . . . . . . . . . . . . . . .
+
+6
+6
+6
+6
+6
+7
+7
+7
+8
+
+4 Quá trình Cài đặt và Triển khai
+9
+4.1 Công nghệ sử dụng . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 9
+4.2 Cầu nối MQTT (MQTT Bridge) . . . . . . . . . . . . . . . . . . . . . . . . . . 9
+4.3 Triển khai với Docker Compose . . . . . . . . . . . . . . . . . . . . . . . . . 9
+4.4 Bảo trì và Sao lưu (Maintenance and Backup) . . . . . . . . . . . . . . . . . 10
+5 Kết quả và Đánh giá
+11
+5.1 Kết quả sản phẩm . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 11
+5.2 Đánh giá chung . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 20
+5.3 Hạn chế và quan sát . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 20
+5.4 Kết luận đánh giá . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 21
+6 Kết luận và Hướng phát triển
+
+Báo cáo Đồ án Đa ngành (CO3109), Học kỳ 252, Năm học 2025-2026
+
+22
+
+Page 1/23
+
+Trường Đại học Bách Khoa
+Khoa Khoa học và Kỹ thuật máy tính
+
+Bảng phân công
+STT
+
+Họ và tên
+
+MSSV
+
+Nhiệm vụ
+
+Đóng góp
+(%)
+
+1
+
+Lê Hoàng Tân
+
+2313050
+
+Lập trình nhúng Yolo:Bit,
+
+100%
+
+thiết kế giao diện
+Dashboard (Frontend),
+Kiểm thử chương trình.
+2
+
+Nguyễn Hưng
+Thịnh
+
+2313287
+
+Lập trình nhúng Yolo:Bit,
+
+100%
+
+Triển khai hạ tầng
+Server (Docker, NPM),
+xây dựng Backend API
+và MQTT Bridge.
+
+Báo cáo Đồ án Đa ngành (CO3109), Học kỳ 252, Năm học 2025-2026
+
+Page 2/23
+
+Trường Đại học Bách Khoa
+Khoa Khoa học và Kỹ thuật máy tính
+
+1
+
+Giới thiệu
+
+Bối cảnh
+Với sự phổ biến của các thiết bị nhúng giá rẻ như ESP32 và nhu cầu ngày càng
+tăng về giám sát và điều khiển từ xa trong các hệ thống nhà thông minh, việc xây
+dựng một nền tảng tích hợp để thu thập dữ liệu cảm biến, lưu trữ lịch sử, hiển thị
+trực quan và điều khiển thiết bị trở nên thiết yếu. Đồ án Simplehome nhằm thiết kế
+và triển khai một hệ thống IoT kết nối các board Yolo Bit (ESP32) với một nền tảng
+server/dashboard hiện đại, với các yêu cầu về độ tin cậy, bảo mật và khả năng mở
+rộng.
+
+Mục tiêu chính
+Đồ án đặt ra các mục tiêu chính sau:
+• Thiết kế và triển khai kiến trúc phần mềm cho hệ thống IoT hỗ trợ thu thập dữ
+liệu thời gian thực, lưu trữ chuỗi thời gian và truy vấn hiệu quả.
+• Xây dựng cầu nối giữa giao thức nhắn tin nhẹ MQTT của các thiết bị cảm biến
+và API REST phục vụ giao diện người dùng (frontend).
+• Đảm bảo các tính chất quan trọng: xác thực đa người dùng, ghi nhận lịch sử hành
+động (audit trail), bảo mật dữ liệu và triển khai an toàn bằng containerization.
+• Đánh giá hiệu năng cơ bản, độ trễ của hệ thống và tính ổn định khi mở rộng số
+lượng thiết bị.
+
+Phạm vi của đồ án
+Đồ án bao gồm:
+• Một backend Node.js đóng vai trò MQTT client, chuyển tiếp dữ liệu cảm biến vào
+cơ sở dữ liệu PostgreSQL và cung cấp RESTful API cho các yêu cầu từ frontend.
+• Một frontend Next.js cung cấp giao diện người dùng: đăng nhập, bảng điều
+khiển thời gian thực, biểu đồ lịch sử dữ liệu cảm biến và các widget điều khiển
+thiết bị.
+• Triển khai toàn bộ hệ thống bằng Docker Compose để đơn giản hóa cài đặt, cấu
+hình và tái tạo môi trường.
+• Mô tả chi tiết kiến trúc hệ thống, luồng dữ liệu, giao thức truyền thông và các
+biện pháp bảo mật.
+
+Báo cáo Đồ án Đa ngành (CO3109), Học kỳ 252, Năm học 2025-2026
+
+Page 3/23
+
+Trường Đại học Bách Khoa
+Khoa Khoa học và Kỹ thuật máy tính
+
+Cấu trúc báo cáo
+Báo cáo được tổ chức thành sáu phần chính:
+1. Giới thiệu — trình bày bối cảnh, mục tiêu và phạm vi của đồ án.
+2. Cơ sở lý thuyết — giới thiệu các khái niệm, công nghệ và tiêu chuẩn liên quan
+(IoT, MQTT, Backend/Frontend, Container, v.v.).
+3. Phân tích và Thiết kế hệ thống — mô tả chi tiết kiến trúc hệ thống, lớp ứng
+dụng, lưu trữ dữ liệu, luồng tương tác và giao thức truyền thông.
+4. Quá trình Cài đặt và Triển khai — trình bày các công nghệ sử dụng, môi
+trường phát triển, và các bước thực hiện triển khai hệ thống.
+5. Kết quả thực nghiệm và Đánh giá — đánh giá hiệu năng, độ trễ hệ thống,
+khả năng mở rộng và tính ổn định.
+6. Kết luận và Hướng phát triển — tóm tắt những đóng góp chính, hạn chế hiện
+tại và các hướng cải tiến trong tương lai.
+
+Báo cáo Đồ án Đa ngành (CO3109), Học kỳ 252, Năm học 2025-2026
+
+Page 4/23
+
+Trường Đại học Bách Khoa
+Khoa Khoa học và Kỹ thuật máy tính
+
+2
+
+Cơ sở lý thuyết
+
+2.1 Internet of Things (IoT) và Giao thức MQTT
+Internet of Things là mạng lưới các thiết bị vật lý có khả năng kết nối và trao đổi dữ
+liệu. Trong hệ thống này, giao thức MQTT (Message Queuing Telemetry Transport)
+được chọn làm giao thức truyền thông chính do tính nhẹ (lightweight), sử dụng mô
+hình Publish/Subscribe, rất phù hợp cho các thiết bị có tài nguyên hạn chế như vi
+điều khiển ESP32.
+
+2.2 Hệ quản trị Cơ sở dữ liệu Quan hệ (PostgreSQL)
+Để lưu trữ dữ liệu telemetry và thông tin người dùng một cách bền vững, PostgreSQL
+được sử dụng. Đây là một hệ quản trị CSDL mã nguồn mở mạnh mẽ, hỗ trợ các truy
+vấn phức tạp và đảm bảo tính toàn vẹn dữ liệu (ACID), điều này rất quan trọng khi
+ghi nhận hàng ngàn bản ghi từ cảm biến.
+
+2.3 Kiến trúc Server-Side với Node.js và Next.js
+• Node.js: Sử dụng kiến trúc hướng sự kiện, non-blocking I/O, cho phép xử lý
+hàng ngàn kết nối đồng thời từ Broker MQTT và Frontend API.
+• Next.js: Một React framework hiện đại, hỗ trợ Server-Side Rendering (SSR)
+giúp dashboard tải nhanh hơn và bảo mật hơn khi giao tiếp với Backend.
+
+2.4 Ảo hóa với Docker
+Docker cho phép đóng gói ứng dụng cùng với tất cả các thư viện phụ thuộc vào
+một container duy nhất. Điều này giải quyết bài toán ”it works on my machine” và
+giúp việc triển khai hệ thống trên server (Cloud/VPS) trở nên nhất quán và dễ dàng
+quản lý thông qua Docker Compose.
+
+Báo cáo Đồ án Đa ngành (CO3109), Học kỳ 252, Năm học 2025-2026
+
+Page 5/23
+
+Trường Đại học Bách Khoa
+Khoa Khoa học và Kỹ thuật máy tính
+
+3
+
+Phân tích và Thiết kế hệ thống
+
+3.1 Hạ tầng Máy chủ (Server Infrastructure)
+Hệ thống được triển khai trên hạ tầng máy chủ vật lý tự vận hành (on-premise),
+đảm bảo quyền kiểm soát hoàn toàn đối với dữ liệu và cấu hình mạng.
+3.1.1 Cấu hình Phần cứng
+Mặc dù sử dụng phần cứng thế hệ cũ, máy chủ vẫn đáp ứng tốt các yêu cầu xử lý
+song song nhờ sự tối ưu hóa của các container:
+• CPU: AMD A6-6400K 2 nhân 2 luồng, xung nhịp 3.9GHz.
+• RAM: 10GB DDR3 1600MHz (Kit 8 + 2).
+• Lưu trữ: 120GB SATA2 SSD.
+• Kết nối: 2 cổng mạng 1Gbps (vận hành theo kiểu bond).
+3.1.2 Môi trường Phần mềm và Bảo mật
+• Hệ điều hành: Ubuntu Server 24.04 LTS (headless không giao diện GUI) nhằm
+tối ưu tài nguyên.
+• Containerization: Docker-Engine là nền tảng cốt lõi để cô lập và quản lý dịch
+vụ.
+• Tường lửa (UFW): Cấu hình nghiêm ngặt, chỉ cho phép các cổng cần thiết: 80,
+443 (Web/SSL), 1883 (MQTT), 22 (SSH).
+• Bảo mật hệ thống: Sử dụng Crownstrike để giám sát và Authelia kết hợp với
+Headscale VPN để thiết lập cơ chế xác thực tập trung (SSO). Điều này cho phép
+truy cập và điều khiển máy chủ từ xa (SSH) một cách an toàn thông qua mạng
+riêng ảo.
+3.1.3 Hệ sinh thái Container
+Các dịch vụ được chia làm hai nhóm chính:
+• Nhóm Ứng dụng: Mosquitto (MQTT Broker), SimpleHome Backend/Frontend,
+Nginx, Nginx Proxy Manager (Quản lý SSL/Proxy).
+• Nhóm Quản trị & Phát triển: Headscale (VPN), Headplane (GUI quản lý VPN),
+Portainer (Quản lý Container/Volume), Authelia (SSO), Pi-hole (DNS Filtering),
+Crowstrike (Giám sát bảo mật).
+
+Báo cáo Đồ án Đa ngành (CO3109), Học kỳ 252, Năm học 2025-2026
+
+Page 6/23
+
+Trường Đại học Bách Khoa
+Khoa Khoa học và Kỹ thuật máy tính
+
+3.1.4 Mạng và Sao lưu
+• Tên miền: Sử dụng dịch vụ Dynu DDNS (hungthinhcloud.freeddns.org) kết hợp
+với Router gia đình có IP WAN tĩnh và cấu hình Firewall chặt chẽ.
+• Chiến lược sao lưu: Thực hiện sao lưu định kỳ hàng tháng cho dữ liệu Docker
+và ổ đĩa hệ điều hành bằng công cụ Restic và Timeshift, đảm bảo khả năng phục
+hồi sau sự cố.
+
+3.2 Kiến trúc hệ thống
+Hệ thống được thiết kế theo mô hình kiến trúc phân lớp, đảm bảo tính tách biệt
+giữa thu thập dữ liệu, xử lý logic và hiển thị giao diện. Luồng dữ liệu chính bao gồm:
+1. Thiết bị (Mạch Yolo:Bit): Thu thập dữ liệu cảm biến (Nhiệt độ, Độ ẩm, Ánh
+sáng) và gửi lên Broker MQTT thông qua mạng Wi-Fi.
+2. MQTT Broker (Mosquitto): Đóng vai trò trung gian, nhận dữ liệu từ thiết bị
+và chuyển tiếp tới các subscriber.
+3. Backend (Node.js): Đóng vai trò vừa là MQTT Client (để lưu trữ dữ liệu vào
+DB) vừa là REST API Server (để phục vụ Frontend).
+4. Database (PostgreSQL): Lưu trữ thông tin người dùng, danh sách thiết bị và
+lịch sử telemetry.
+5. Frontend (Next.js): Giao diện người dùng cuối, hiển thị dữ liệu và gửi lệnh
+điều khiển.
+
+3.3 Thiết kế Cơ sở dữ liệu
+Hệ thống sử dụng PostgreSQL để quản lý dữ liệu quan hệ. Sơ đồ thực thể bao gồm
+các bảng chính:
+• users: Lưu trữ thông tin định danh và xác thực (id, username, password_hash,
+role).
+• devices: Quản lý trạng thái các thiết bị (device_id, name, status, last_seen).
+• telemetry_logs: Lưu trữ chuỗi thời gian dữ liệu cảm biến (id, device_id, sensor_type,
+value, timestamp).
+• control_logs: Nhật ký ghi lại các lệnh điều khiển từ người dùng (id, user_id,
+device_id, action, timestamp).
+
+Báo cáo Đồ án Đa ngành (CO3109), Học kỳ 252, Năm học 2025-2026
+
+Page 7/23
+
+Trường Đại học Bách Khoa
+Khoa Khoa học và Kỹ thuật máy tính
+
+3.4 Giao thức truyền thông (MQTT)
+Hệ thống sử dụng cấu trúc topic phân cấp để quản lý thông điệp:
+• Telemetry: simplehome/sensor/{device_id}/{sensor_type}
+• Control: simplehome/control/{device_id}/{action_type}
+Dữ liệu được truyền tải dưới định dạng chuỗi đơn giản hoặc JSON để tối ưu hóa băng
+thông cho vi điều khiển ESP32.
+
+Báo cáo Đồ án Đa ngành (CO3109), Học kỳ 252, Năm học 2025-2026
+
+Page 8/23
+
+Trường Đại học Bách Khoa
+Khoa Khoa học và Kỹ thuật máy tính
+
+4
+
+Quá trình Cài đặt và Triển khai
+
+4.1 Công nghệ sử dụng
+• Backend: Node.js với framework Express, sử dụng thư viện mqtt để kết nối
+Broker và pg để làm việc với PostgreSQL.
+• Frontend: Next.js 14 (App Router), Tailwind CSS cho giao diện và Lucide React
+cho icon.
+• Infrastructure: Docker & Docker Compose để quản lý các dịch vụ độc lập.
+• Proxy: Nginx Proxy Manager (NPM) được sử dụng để quản lý tên miền con
+(dashboard.* và api.*) cùng với chứng chỉ SSL.
+
+4.2 Cầu nối MQTT (MQTT Bridge)
+Một trong những thành phần quan trọng nhất của Backend là MQTT Bridge. Đoạn
+mã dưới đây minh họa cách Backend lắng nghe dữ liệu từ cảm biến và lưu trực tiếp
+vào cơ sở dữ liệu PostgreSQL:
+1
+
+client.on('message', async (topic, message) => {
+
+2
+
+const parts = topic.split('/');
+
+3
+
+if (parts[1] === 'sensor') {
+
+4
+
+const deviceId = parts[2];
+
+5
+
+const sensorType = parts[3];
+
+6
+
+const value = message.toString();
+
+7
+
+await pool.query(
+
+8
+9
+
+'INSERT INTO telemetry_logs (device_id, sensor_type, value) VALUES
+
+10
+
+[deviceId, sensorType, value]
+
+,→
+
+);
+
+11
+
+}
+
+12
+13
+
+($1, $2, $3)',
+
+});
+
+4.3 Triển khai với Docker Compose
+Hệ thống được đóng gói thành các container riêng biệt, cho phép triển khai nhanh
+chóng trên bất kỳ server Linux nào. Cấu trúc tệp docker-compose.yml điều phối sự phụ
+thuộc giữa các dịch vụ:
+1
+2
+
+services:
+simplehome_db:
+
+Báo cáo Đồ án Đa ngành (CO3109), Học kỳ 252, Năm học 2025-2026
+
+Page 9/23
+
+Trường Đại học Bách Khoa
+Khoa Khoa học và Kỹ thuật máy tính
+
+3
+
+image: postgres:16-alpine
+
+4
+
+environment:
+
+5
+
+- POSTGRES_PASSWORD=${DB_PASSWORD}
+
+6
+7
+8
+9
+10
+11
+12
+
+simplehome_backend:
+build: ./backend
+depends_on:
+- simplehome_db
+environment:
+- DB_HOST=simplehome_db
+Việc sử dụng biến môi trường (.env) giúp bảo mật các thông tin nhạy cảm như mật
+khẩu cơ sở dữ liệu và mã bí mật JWT khỏi mã nguồn công khai.
+
+4.4 Bảo trì và Sao lưu (Maintenance and Backup)
+Hệ thống được thiết kế để hoạt động bền bỉ với quy trình bảo trì tự động:
+• Cập nhật: Docker Compose giúp việc cập nhật ứng dụng trở nên đơn giản chỉ
+với lệnh pull và up -d.
+• Sao lưu dữ liệu: Một script bash (backup.sh) được cấu hình để dừng các container
+một cách an toàn, sau đó sử dụng công cụ restic để sao lưu toàn bộ thư mục
+cấu hình và dữ liệu Docker (/opt/docker) vào một ổ đĩa gắn ngoài hoặc lưu trữ
+đám mây.
+Dưới đây là một phần nội dung của script sao lưu được sử dụng:
+
+1
+
+# 1. Gracefully stop all containers
+
+2
+
+docker compose stop
+
+3
+4
+
+# 2. Run the backup using restic
+
+5
+
+restic -r $REPO --verbose backup $SOURCE
+
+6
+7
+
+# 3. Clean up old backups (policy)
+
+8
+
+restic -r $REPO forget --keep-weekly 4 --prune
+
+9
+10
+
+# 4. Start all containers back up
+
+11
+
+docker compose start
+
+Báo cáo Đồ án Đa ngành (CO3109), Học kỳ 252, Năm học 2025-2026
+
+Page 10/23
+
+Trường Đại học Bách Khoa
+Khoa Khoa học và Kỹ thuật máy tính
+
+5
+
+Kết quả và Đánh giá
+
+5.1 Kết quả sản phẩm
+
+Hình 1: Serial Monitor
+
+Báo cáo Đồ án Đa ngành (CO3109), Học kỳ 252, Năm học 2025-2026
+
+Page 11/23
+
+Trường Đại học Bách Khoa
+Khoa Khoa học và Kỹ thuật máy tính
+
+Hình 2: Kết nối mạch
+
+Báo cáo Đồ án Đa ngành (CO3109), Học kỳ 252, Năm học 2025-2026
+
+Page 12/23
+
+Trường Đại học Bách Khoa
+Khoa Khoa học và Kỹ thuật máy tính
+
+Hình 3: Sửa các phần cứng cũ để tận dùng làm server tại gia
+
+Báo cáo Đồ án Đa ngành (CO3109), Học kỳ 252, Năm học 2025-2026
+
+Page 13/23
+
+Trường Đại học Bách Khoa
+Khoa Khoa học và Kỹ thuật máy tính
+
+Hình 4: MQTT Explorer để quan sát các topic và payload được gửi lên từ thiết bị
+Yolo:Bit (Hiện không có topic nào)
+
+Hình 5: Dev Client kết nối với server thông qua Tailscale VPN
+
+Báo cáo Đồ án Đa ngành (CO3109), Học kỳ 252, Năm học 2025-2026
+
+Page 14/23
+
+Trường Đại học Bách Khoa
+Khoa Khoa học và Kỹ thuật máy tính
+
+Hình 6: Trang chủ của server HungThinhCloud ‘hungthinhcloud.freeddns.org‘
+
+Báo cáo Đồ án Đa ngành (CO3109), Học kỳ 252, Năm học 2025-2026
+
+Page 15/23
+
+Trường Đại học Bách Khoa
+Khoa Khoa học và Kỹ thuật máy tính
+
+Hình 7: Có thể toggle theme sáng, tối, system
+
+Báo cáo Đồ án Đa ngành (CO3109), Học kỳ 252, Năm học 2025-2026
+
+Page 16/23
+
+Trường Đại học Bách Khoa
+Khoa Khoa học và Kỹ thuật máy tính
+
+Hình 8: Giao diện đăng nhập với chủ để theo theme của client
+Sau khi nhấn vào card ”SimpleHOME” và đăng nhập thành công, chúng ta sẽ đến
+với trang dashboard quan sát và điều khiển các thiết bị phần cứng.
+
+Báo cáo Đồ án Đa ngành (CO3109), Học kỳ 252, Năm học 2025-2026
+
+Page 17/23
+
+Trường Đại học Bách Khoa
+Khoa Khoa học và Kỹ thuật máy tính
+
+Hình 9: SimpleHome Dashboard
+
+Hình 10: Các Card để Quan sát dữ liệu của mạch Yolo:Bit
+
+Báo cáo Đồ án Đa ngành (CO3109), Học kỳ 252, Năm học 2025-2026
+
+Page 18/23
+
+Trường Đại học Bách Khoa
+Khoa Khoa học và Kỹ thuật máy tính
+
+Hình 11: Các Card để Điều khiển phần cứng được cắm vào mạch
+Đây là một trang dashboard IoT tiêu chuẩn cho một hệ thống Nhà thông minh
+như Yolo Home. Chúng có các Card dùng để quan sát các dữ liệu như:
+• Nhiệt độ, Độ ẩm được lấy từ DHT20.
+• Cường độ ánh sáng được đo từ Cảm biến ánh sáng.
+• Trạng thái cửa đóng/mở.
+• Trạng thái bật/tắt và tốc độ của quạt
+• Và cuối cùng là trạng thái của toàn bộ hệ thống.
+Ngoài ra còn có các Card điều khiển:
+• Card Lighting với 3 mode AUTO, ON, OFF
+– Mode AUTO: Đèn sẽ tự động bật/tắt tùy theo giá trị cường độ ánh sáng được
+đo từ cảm biến ánh sáng. Nếu trời ”tối” thì tự động bật đèn, nếu trời ”sáng”
+thì tự động tắt đèn.
+– MODE ON: Bật đèn ngay lập tức, đèn sẽ được bật cho đến khi chuyển qua
+các mode khác.
+– MODE OFF: Tắt đèn, hoạt động tương tự như mode ON.
+• Card Security Door với 2 mode LOCK và UNLOCK
+– Mode LOCK: Như tên gọi, cửa sẽ ngay lập tức đóng lại. Ngoài ra khi đóng
+cửa, nếu cảm biến IR phát hiện chuyển động (có người), hệ thống sẽ phát
+cảnh báo về serial monitor.
+– MODE UNLOCK: Mở cửa.
+• Card Ventilation Fan Control với 3 mode TURN ON, TURN OFF và SET SPEED
+Báo cáo Đồ án Đa ngành (CO3109), Học kỳ 252, Năm học 2025-2026
+
+Page 19/23
+
+Trường Đại học Bách Khoa
+Khoa Khoa học và Kỹ thuật máy tính
+
+– TURN ON: Bật quạt.
+– TURN OFF: Tắt quạt.
+– SET SPEED: Điều chỉnh tốc độ quạt, tốc độ quạt có thể quay từ 0 - 100%.
+
+5.2 Đánh giá chung
+Tài liệu này trình bày kết quả chức năng chính của hệ thống Simplehome dưới
+dạng mô tả và quan sát thực nghiệm, không kèm số liệu định lượng. Trong quá trình
+kiểm thử thực tế bằng các board Yolo Bit (ESP32) và môi trường Docker Compose,
+hệ thống vận hành đạt các tiêu chí sau:
+• Hoạt động chức năng: Các thiết bị có thể kết nối tới broker MQTT, gửi dữ liệu
+telemetry và nhận lệnh điều khiển; backend nhận và lưu trữ dữ liệu vào cơ sở
+dữ liệu; frontend hiển thị dữ liệu thời gian thực và nhận lệnh người dùng.
+• Tính chính xác về chức năng: Các thao tác điều khiển (ví dụ bật/tắt thiết bị)
+phản hồi đúng theo mong đợi trong kịch bản thử nghiệm, và hành động người
+dùng được ghi nhận vào nhật ký điều khiển (audit logs).
+• Trải nghiệm người dùng: Giao diện dashboard hiển thị rõ ràng trạng thái
+thiết bị, cho phép điều hướng giữa các biểu đồ lịch sử và bảng điều khiển, đồng
+thời hỗ trợ thay đổi theme như minh họa trong hình trước.
+• Tính bền vững cơ bản: Trong các lần thử cắm/mở lại thiết bị và khởi động lại
+container, hệ thống vẫn khôi phục kết nối và tiếp tục ghi nhận dữ liệu (behavior
+cơ bản đã được kiểm chứng bằng thao tác thủ công).
+
+5.3 Hạn chế và quan sát
+Mặc dù hệ thống vận hành đúng chức năng, một số hạn chế quan sát được mà
+không cần đo lường chính thức bao gồm:
+• Việc truyền qua mạng Wi‑Fi có thể gây mất gói hoặc trễ tạm thời trong điều
+kiện tín hiệu yếu; cơ chế retry ở tầng MQTT cần được tinh chỉnh khi triển khai
+thực tế.
+• Một số cảnh báo về xử lý file (ví dụ xử lý ảnh SVG nếu không có Inkscape) xuất
+hiện trong quá trình biên dịch tài liệu; đây là vấn đề của môi trường build, không
+ảnh hưởng tới logic hệ thống.
+• Các kiểm thử hiện tại chủ yếu là thủ công và cục bộ; để đánh giá chính xác hiệu
+năng và khả năng mở rộng cần bổ sung kịch bản tải (load test) và thu thập số
+liệu.
+
+Báo cáo Đồ án Đa ngành (CO3109), Học kỳ 252, Năm học 2025-2026
+
+Page 20/23
+
+Trường Đại học Bách Khoa
+Khoa Khoa học và Kỹ thuật máy tính
+
+5.4 Kết luận đánh giá
+Tóm lại, hệ thống đã hoàn thành các chức năng chính theo mục tiêu đồ án ở mức
+thực nghiệm: kết nối thiết bị, truyền dữ liệu, lưu trữ và hiển thị. Các bước tiếp theo
+nên tập trung vào đo lường định lượng, tự động hóa kiểm thử và gia cố bảo mật trước
+khi tiến hành triển khai quy mô lớn.
+
+Báo cáo Đồ án Đa ngành (CO3109), Học kỳ 252, Năm học 2025-2026
+
+Page 21/23
+
+Trường Đại học Bách Khoa
+Khoa Khoa học và Kỹ thuật máy tính
+
+6
+
+Kết luận và Hướng phát triển
+
+Tóm tắt kết quả
+Hệ thống SimpleHome là một prototype end-to-end cho nhà thông minh, bao gồm
+các thành phần chính:
+• Lớp thiết bị: board Yolo:Bit (ESP32) publish/subscribe qua MQTT (topic tiền tố
+simplehome/sensor/ và simplehome/control/).
+• Tầng tích hợp: backend Node.js (TypeScript) hoạt động như MQTT bridge và
+REST API, cài đặt các endpoint chính như /api/health, /api/auth/login, /api/devices,
+/api/telemetry, /api/control.
+• Lớp lưu trữ: PostgreSQL (container simplehome_db) lưu users, devices, telemetry_logs,
+control_logs.
+• Giao diện: frontend Next.js (container simplehome_frontend) cung cấp trang đăng
+nhập, dashboard thời gian thực, và widgets điều khiển.
+• Orchestration: Docker Compose với mạng simplehome_net, healthchecks và proxy
+(Nginx Proxy Manager) cho SSL và tên miền công khai.
+Trong phạm vi triển khai thực nghiệm, các tính năng chức năng cơ bản đã hoạt
+động: thiết bị gửi telemetry, backend ghi nhận vào database, frontend hiển thị dữ
+liệu và gửi lệnh điều khiển, và các hành động được ghi vào control_logs.
+
+Những điểm mạnh
+• Kiến trúc rõ ràng, module hoá và dễ tái tạo bằng Docker Compose.
+• Kết hợp MQTT và REST API cho phép cả thiết bị nhẹ và UI web tương tác linh
+hoạt.
+• Tích hợp healthchecks và cấu hình proxy giúp triển khai thực tế dễ dàng hơn.
+• Frontend đã cung cấp trải nghiệm dashboard trực quan (theme, cards, control
+widgets) phù hợp để demo.
+• Hạ tầng bảo mật mạnh mẽ: Sử dụng Authelia (SSO) và Headscale VPN để bảo
+vệ quyền truy cập từ xa, kết hợp với Crownstrike để giám sát hệ thống.
+• Hệ thống sao lưu tin cậy: Quy trình sao lưu định kỳ bằng Restic và Timeshift
+giúp bảo vệ toàn diện dữ liệu ứng dụng và cấu hình hệ điều hành.
+
+Báo cáo Đồ án Đa ngành (CO3109), Học kỳ 252, Năm học 2025-2026
+
+Page 22/23
+
+Trường Đại học Bách Khoa
+Khoa Khoa học và Kỹ thuật máy tính
+
+Hạn chế và rủi ro
+• Xác thực hiện đang dùng bản mẫu (ví dụ so sánh mật khẩu trực tiếp trong
+server.ts và trả về “dummy-jwt-token”); cần thay bằng cơ chế băm mật khẩu
+(bcrypt/argon2) và phát hành JWT hợp lệ.
+• Chưa có thiết lập hoàn chỉnh cho bảo mật MQTT (TLS, credential management)
+trong docker-compose.yml mặc định; broker hiện tại mosquitto_public:1883 cần
+gia cố trước khi mở ra public.
+• Kiểm thử hiện tại chủ yếu thủ công; thiếu số liệu định lượng về latency, throughput,
+và resource usage.
+• Chưa thực hiện kiểm thử tải và phân tích giới hạn mở rộng (scalability).
+
+Hướng phát triển
+Các bước cụ thể để chuyển prototype thành hệ thống sẵn sàng thử nghiệm quy
+mô lớn:
+1. Hoàn thiện bảo mật và xác thực: sử dụng bcrypt/argon2 cho password hashing,
+phát JWT có thời hạn, cấu hình TLS cho Mosquitto và HTTPS cho tất cả endpoint
+qua Nginx Proxy Manager.
+2. Tự động hoá kiểm thử và thu thập metrics: tạo script MQTT producer để mô
+phỏng thiết bị, dùng k6 hoặc wrk để stress test API; thu metrics bằng Prometheus
+và hiển thị với Grafana.
+3. Cải thiện độ tin cậy thiết bị: thêm buffering/local queue trên ESP32, định
+nghĩa QoS MQTT phù hợp, và cơ chế retry/backoff.
+4. Giám sát và logging tập trung: cấu hình Prometheus + Grafana cho hệ thống,
+và thu thập logs bằng Loki/ELK để điều tra vận hành.
+5. CI/CD và reproducibility: thêm workflow để build/test backend & frontend,
+migration script cho database và pipeline để build LaTeX report tự động (nếu
+cần lưu PDF lên artifact).
+Tổng kết: dự án đã đạt được mục tiêu làm một prototype chức năng, minh hoạ rõ
+ràng luồng dữ liệu IoT hiện đại. Để tiến tới bản sản phẩm thử nghiệm thực tế, cần
+hoàn thiện bảo mật, tự động hoá kiểm thử và bổ sung giám sát/metrics.
+
+Mã nguồn dự án (Open Source)
+Toàn bộ mã nguồn của dự án (bao gồm Firmware, Backend, Frontend và cấu hình
+Docker) được công khai tại GitHub để cộng đồng có thể tham khảo và phát triển
+thêm:
+• GitHub Repository: https://github.com/1172005thinh/SimpleHome
+
+Báo cáo Đồ án Đa ngành (CO3109), Học kỳ 252, Năm học 2025-2026
+
+Page 23/23
+
+

@@ -1,0 +1,17 @@
+\newpage
+\section{Cơ sở lý thuyết}
+
+\subsection{Internet of Things (IoT) và Giao thức MQTT}
+Internet of Things là mạng lưới các thiết bị vật lý có khả năng kết nối và trao đổi dữ liệu. Trong hệ thống này, giao thức MQTT (Message Queuing Telemetry Transport) được chọn làm giao thức truyền thông chính do tính nhẹ (lightweight), sử dụng mô hình Publish/Subscribe, rất phù hợp cho các thiết bị có tài nguyên hạn chế như vi điều khiển ESP32.
+
+\subsection{Hệ quản trị Cơ sở dữ liệu Quan hệ (PostgreSQL)}
+Để lưu trữ dữ liệu telemetry và thông tin người dùng một cách bền vững, PostgreSQL được sử dụng. Đây là một hệ quản trị CSDL mã nguồn mở mạnh mẽ, hỗ trợ các truy vấn phức tạp và đảm bảo tính toàn vẹn dữ liệu (ACID), điều này rất quan trọng khi ghi nhận hàng ngàn bản ghi từ cảm biến.
+
+\subsection{Kiến trúc Server-Side với Node.js và Next.js}
+\begin{itemize}
+    \item Node.js: Sử dụng kiến trúc hướng sự kiện, non-blocking I/O, cho phép xử lý hàng ngàn kết nối đồng thời từ Broker MQTT và Frontend API.
+    \item Next.js: Một React framework hiện đại, hỗ trợ Server-Side Rendering (SSR) giúp dashboard tải nhanh hơn và bảo mật hơn khi giao tiếp với Backend.
+\end{itemize}
+
+\subsection{Ảo hóa với Docker}
+Docker cho phép đóng gói ứng dụng cùng với tất cả các thư viện phụ thuộc vào một container duy nhất. Điều này giải quyết bài toán ”it works on my machine” và giúp việc triển khai hệ thống trên server (Cloud/VPS) trở nên nhất quán và dễ dàng quản lý thông qua Docker Compose.

@@ -1,0 +1,59 @@
+\newpage
+\section{Phân tích và Thiết kế hệ thống}
+
+\subsection{Hạ tầng Máy chủ (Server Infrastructure)}
+Hệ thống được triển khai trên hạ tầng máy chủ vật lý tự vận hành (on-premise), đảm bảo quyền kiểm soát hoàn toàn đối với dữ liệu và cấu hình mạng.
+\subsubsection{Cấu hình Phần cứng}
+Mặc dù sử dụng phần cứng thế hệ cũ, máy chủ vẫn đáp ứng tốt các yêu cầu xử lý song song nhờ sự tối ưu hóa của các container:
+\begin{itemize}
+    \item CPU: AMD A6-6400K 2 nhân 2 luồng, xung nhịp 3.9GHz.
+    \item RAM: 10GB DDR3 1600MHz (Kit 8 + 2).
+    \item Lưu trữ: 120GB SATA2 SSD.
+    \item Kết nối: 2 cổng mạng 1Gbps (vận hành theo kiểu bond).
+\end{itemize}
+\subsubsection{Môi trường Phần mềm và Bảo mật}
+\begin{itemize}
+    \item Hệ điều hành: Ubuntu Server 24.04 LTS (headless không giao diện GUI) nhằm tối ưu tài nguyên.
+    \item Containerization: Docker-Engine là nền tảng cốt lõi để cô lập và quản lý dịch vụ.
+    \item Tường lửa (UFW): Cấu hình nghiêm ngặt, chỉ cho phép các cổng cần thiết: 80, 443 (Web/SSL), 1883 (MQTT), 22 (SSH).
+    \item Bảo mật hệ thống: Sử dụng Crownstrike để giám sát và Authelia kết hợp với Headscale VPN để thiết lập cơ chế xác thực tập trung (SSO). Điều này cho phép truy cập và điều khiển máy chủ từ xa (SSH) một cách an toàn thông qua mạng riêng ảo.
+\end{itemize}
+\subsubsection{Hệ sinh thái Container}
+Các dịch vụ được chia làm hai nhóm chính:
+\begin{itemize}
+    \item Nhóm Ứng dụng: Mosquitto (MQTT Broker), SimpleHome Backend/Frontend, Nginx, Nginx Proxy Manager (Quản lý SSL/Proxy).
+    \item Nhóm Quản trị \& Phát triển: Headscale (VPN), Headplane (GUI quản lý VPN), Portainer (Quản lý Container/Volume), Authelia (SSO), Pi-hole (DNS Filtering), Crowstrike (Giám sát bảo mật).
+\end{itemize}
+
+\subsubsection{Mạng và Sao lưu}
+\begin{itemize}
+    \item Tên miền: Sử dụng dịch vụ Dynu DDNS (hungthinhcloud.freeddns.org) kết hợp với Router gia đình có IP WAN tĩnh và cấu hình Firewall chặt chẽ.
+    \item Chiến lược sao lưu: Thực hiện sao lưu định kỳ hàng tháng cho dữ liệu Docker và ổ đĩa hệ điều hành bằng công cụ Restic và Timeshift, đảm bảo khả năng phục hồi sau sự cố.
+\end{itemize}
+
+\subsection{Kiến trúc hệ thống}
+Hệ thống được thiết kế theo mô hình kiến trúc phân lớp, đảm bảo tính tách biệt giữa thu thập dữ liệu, xử lý logic và hiển thị giao diện. Luồng dữ liệu chính bao gồm:
+\begin{enumerate}
+    \item Thiết bị (Mạch Yolo:Bit): Thu thập dữ liệu cảm biến (Nhiệt độ, Độ ẩm, Ánh sáng) và gửi lên Broker MQTT thông qua mạng Wi-Fi.
+    \item MQTT Broker (Mosquitto): Đóng vai trò trung gian, nhận dữ liệu từ thiết bị và chuyển tiếp tới các subscriber.
+    \item Backend (Node.js): Đóng vai trò vừa là MQTT Client (để lưu trữ dữ liệu vào DB) vừa là REST API Server (để phục vụ Frontend).
+    \item Database (PostgreSQL): Lưu trữ thông tin người dùng, danh sách thiết bị và lịch sử telemetry.
+    \item Frontend (Next.js): Giao diện người dùng cuối, hiển thị dữ liệu và gửi lệnh điều khiển.
+\end{enumerate}
+
+\subsection{Thiết kế Cơ sở dữ liệu}
+Hệ thống sử dụng PostgreSQL để quản lý dữ liệu quan hệ. Sơ đồ thực thể bao gồm các bảng chính:
+\begin{itemize}
+    \item users: Lưu trữ thông tin định danh và xác thực (id, username, password\_hash, role).
+    \item devices: Quản lý trạng thái các thiết bị (device\_id, name, status, last\_seen).
+    \item telemetry\_logs: Lưu trữ chuỗi thời gian dữ liệu cảm biến (id, device\_id, sensor\_type, value, timestamp).
+    \item control\_logs: Nhật ký ghi lại các lệnh điều khiển từ người dùng (id, user\_id, device\_id, action, timestamp).
+\end{itemize}
+
+\subsection{Giao thức truyền thông (MQTT)}
+Hệ thống sử dụng cấu trúc topic phân cấp để quản lý thông điệp:
+\begin{itemize}
+    \item Telemetry: simplehome/sensor/\{device\_id\}/\{sensor\_type\}
+    \item Control: simplehome/control/\{device\_id\}/\{action\_type\}
+\end{itemize}
+Dữ liệu được truyền tải dưới định dạng chuỗi đơn giản hoặc JSON để tối ưu hóa băng thông cho vi điều khiển ESP32.

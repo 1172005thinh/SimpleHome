@@ -1,0 +1,71 @@
+\newpage
+\section{Quá trình Cài đặt và Triển khai}
+
+\subsection{Công nghệ sử dụng}
+\begin{itemize}
+    \item Backend: Node.js với framework Express, sử dụng thư viện mqtt để kết nối Broker và pg để làm việc với PostgreSQL.
+    \item Frontend: Next.js 14 (App Router), Tailwind CSS cho giao diện và Lucide React cho icon.
+    \item Infrastructure: Docker \& Docker Compose để quản lý các dịch vụ độc lập.
+    \item Proxy: Nginx Proxy Manager (NPM) được sử dụng để quản lý tên miền con (dashboard.* và api.*) cùng với chứng chỉ SSL.
+\end{itemize}
+
+\subsection{Cầu nối MQTT (MQTT Bridge)}
+Một trong những thành phần quan trọng nhất của Backend là MQTT Bridge. Đoạn mã dưới đây minh họa cách Backend lắng nghe dữ liệu từ cảm biến và lưu trực tiếp vào cơ sở dữ liệu PostgreSQL:
+
+\begin{minted}{typescript}
+client.on('message', async (topic, message) => {
+    const parts = topic.split('/');
+    if (parts[1] === 'sensor') {
+        const deviceId = parts[2];
+        const sensorType = parts[3];
+        const value = message.toString();
+
+        await pool.query(
+            'INSERT INTO telemetry_logs (device_id, sensor_type, value) VALUES ($1, $2, $3)',
+            [deviceId, sensorType, value]
+        );
+    }
+});
+\end{minted}
+
+\subsection{Triển khai với Docker Compose}
+Hệ thống được đóng gói thành các container riêng biệt, cho phép triển khai nhanh chóng trên bất kỳ server Linux nào. Cấu trúc tệp docker-compose.yml điều phối sự phụ thuộc giữa các dịch vụ:
+
+\begin{minted}{yaml}
+services:
+  simplehome_db:
+    image: postgres:16-alpine
+    environment:
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+  
+  simplehome_backend:
+    build: ./backend
+    depends_on:
+      - simplehome_db
+    environment:
+      - DB_HOST=simplehome_db
+\end{minted}
+
+Việc sử dụng biến môi trường (.env) giúp bảo mật các thông tin nhạy cảm như mật khẩu cơ sở dữ liệu và mã bí mật JWT khỏi mã nguồn công khai.
+
+\subsection{Bảo trì và Sao lưu (Maintenance and Backup)}
+Hệ thống được thiết kế để hoạt động bền bỉ với quy trình bảo trì tự động:
+\begin{itemize}
+    \item Cập nhật: Docker Compose giúp việc cập nhật ứng dụng trở nên đơn giản chỉ với lệnh pull và up -d.
+    \item Sao lưu dữ liệu: Một script bash (backup.sh) được cấu hình để dừng các container một cách an toàn, sau đó sử dụng công cụ restic để sao lưu toàn bộ thư mục cấu hình và dữ liệu Docker (/opt/docker) vào một ổ đĩa gắn ngoài hoặc lưu trữ đám mây.
+\end{itemize}
+
+Dưới đây là một phần nội dung của script sao lưu được sử dụng:
+\begin{minted}{bash}
+# 1. Gracefully stop all containers
+docker compose stop
+
+# 2. Run the backup using restic
+restic -r $REPO --verbose backup $SOURCE
+
+# 3. Clean up old backups (policy)
+restic -r $REPO forget --keep-weekly 4 --prune
+
+# 4. Start all containers back up
+docker compose start
+\end{minted}

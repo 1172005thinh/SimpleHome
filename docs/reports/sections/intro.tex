@@ -1,13 +1,10 @@
 \section{Giới thiệu}
 
 \subsection*{Bối cảnh}
-
 Với sự phổ biến của các thiết bị nhúng giá rẻ như ESP32 và nhu cầu ngày càng tăng về giám sát và điều khiển từ xa trong các hệ thống nhà thông minh, việc xây dựng một nền tảng tích hợp để thu thập dữ liệu cảm biến, lưu trữ lịch sử, hiển thị trực quan và điều khiển thiết bị trở nên thiết yếu. Đồ án \textit{Simplehome} nhằm thiết kế và triển khai một hệ thống IoT kết nối các board Yolo Bit (ESP32) với một nền tảng server/dashboard hiện đại, với các yêu cầu về độ tin cậy, bảo mật và khả năng mở rộng.
 
 \subsection*{Mục tiêu chính}
-
 Đồ án đặt ra các mục tiêu chính sau:
-
 \begin{itemize}
     \item Thiết kế và triển khai kiến trúc phần mềm cho hệ thống IoT hỗ trợ thu thập dữ liệu thời gian thực, lưu trữ chuỗi thời gian và truy vấn hiệu quả.
     \item Xây dựng cầu nối giữa giao thức nhắn tin nhẹ MQTT của các thiết bị cảm biến và API REST phục vụ giao diện người dùng (frontend).
@@ -16,9 +13,7 @@ Với sự phổ biến của các thiết bị nhúng giá rẻ như ESP32 và 
 \end{itemize}
 
 \subsection*{Phạm vi của đồ án}
-
 Đồ án bao gồm:
-
 \begin{itemize}
     \item Một backend Node.js đóng vai trò MQTT client, chuyển tiếp dữ liệu cảm biến vào cơ sở dữ liệu PostgreSQL và cung cấp RESTful API cho các yêu cầu từ frontend.
     \item Một frontend Next.js cung cấp giao diện người dùng: đăng nhập, bảng điều khiển thời gian thực, biểu đồ lịch sử dữ liệu cảm biến và các widget điều khiển thiết bị.
@@ -27,9 +22,7 @@ Với sự phổ biến của các thiết bị nhúng giá rẻ như ESP32 và 
 \end{itemize}
 
 \subsection*{Cấu trúc báo cáo}
-
 Báo cáo được tổ chức thành sáu phần chính:
-
 \begin{enumerate}
     \item \textbf{Giới thiệu} — trình bày bối cảnh, mục tiêu và phạm vi của đồ án.
     \item \textbf{Cơ sở lý thuyết} — giới thiệu các khái niệm, công nghệ và tiêu chuẩn liên quan (IoT, MQTT, Backend/Frontend, Container, v.v.).
